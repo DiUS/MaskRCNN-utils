@@ -8,3 +8,4 @@ augmentor/input/images/
 labelbox_parser/.ipynb_checkpoints/
 labelbox_parser/output/images
 labelbox_parser/output/masks
+image_splitter/output
