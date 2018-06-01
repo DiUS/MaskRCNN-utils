@@ -3,6 +3,8 @@
 tmp/
 augmentor/.ipynb_checkpoints/
 augmentor/output/stage1_train
+augmentor/input/masks/
+augmentor/input/images/
 labelbox_parser/.ipynb_checkpoints/
 labelbox_parser/output/images
 labelbox_parser/output/masks
