@@ -71,7 +71,7 @@ for idx in range(len(image_file_list)):
     
     images_list = []
     masks_list = []
-    for i in range(AUGMENTED_IMAGES_PER_ORIGINAL):
+    for i in range(args.number_of_augmented_images_per_original):
         images_list.append(base_image)
         masks_list.append(base_mask)
         
@@ -95,7 +95,7 @@ for idx in range(len(image_file_list)):
     imageio.imwrite("{}/{}".format(augmented_masks_directory,output_base_name), base_mask)
     
     # now write out the augmented image/mask pairs
-    for i in range(AUGMENTED_IMAGES_PER_ORIGINAL):
+    for i in range(args.number_of_augmented_images_per_original):
         output_base_name = "{}_augm_{}{}".format(os.path.splitext(base_name)[0], i, os.path.splitext(base_name)[1])
         imageio.imwrite("{}/{}".format(augmented_images_directory,output_base_name), images_aug[i])
         imageio.imwrite("{}/{}".format(augmented_masks_directory,output_base_name), masks_aug[i])
