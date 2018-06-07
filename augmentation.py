@@ -6,29 +6,33 @@ import numpy as np
 import glob
 import imageio
 import os
+import argparse
+import shutil
 
-input_directory = '/data/vein/augmentor/input'
-image_file_list = glob.glob("{}/images/*.png".format(input_directory))
-mask_file_list = glob.glob("{}/masks/*.png".format(input_directory))
-
-AUGMENTED_IMAGES_PER_ORIGINAL = 1
 IMAGE_EDGE_LENGTH = 1300
 NUMBER_OF_IMAGE_CHANNELS = 3
 NUMBER_OF_MASK_CHANNELS = 1
 
-output_dir = '/data/augmented-vein-data/7-jun'
-augmented_images_directory = "{}/images".format(output_dir)
-augmented_masks_directory = "{}/masks".format(output_dir)
+parser = argparse.ArgumentParser(description='Create an augmented data set.')
+parser.add_argument('-id','--input_directory', type=str, help='Base directory of the images to be augmented.', required=True)
+parser.add_argument('-od','--output_directory', type=str, help='Base directory of the output.', required=True)
+parser.add_argument('-na','--number_of_augmented_images_per_original', type=int, default=1, help='Number of augmented image/mask pairs to produce for each input image/mask pair.', required=False)
+args = parser.parse_args()
 
-# remove all previous augmentations
-import shutil
-if os.path.exists(output_dir):
-    shutil.rmtree(output_dir)
+image_file_list = glob.glob("{}/images/*.png".format(args.input_directory))
+mask_file_list = glob.glob("{}/masks/*.png".format(args.input_directory))
+
+# remove all previous augmentations in this base directory
+if os.path.exists(args.output_directory):
+    shutil.rmtree(args.output_directory)
 
 # create a new directory structure
+augmented_images_directory = "{}/images".format(args.output_directory)
+augmented_masks_directory = "{}/masks".format(args.output_directory)
 os.makedirs(augmented_images_directory)
 os.makedirs(augmented_masks_directory)        
 
+# create the augmentation sequences
 affine_seq = iaa.Sequential([
     iaa.Fliplr(0.5), # horizontally flip 50% of the images
     iaa.Flipud(0.5),
