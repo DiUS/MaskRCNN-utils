@@ -51,7 +51,7 @@ for idx in range(len(image_file_list)):
     augmented_masks = []
 
     base_name = os.path.basename(image_file_list[idx])
-    print("processing {} ({} of {})".format(base_name, idx, len(image_file_list)))
+    print("processing {} ({} of {})".format(base_name, idx+1, len(image_file_list)))
 
     base_image = imageio.imread(image_file_list[idx]).astype(np.uint8)
     base_mask = imageio.imread(mask_file_list[idx]).astype(np.uint8)
