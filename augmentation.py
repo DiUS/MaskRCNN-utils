@@ -53,8 +53,8 @@ for idx in range(len(image_file_list)):
     base_name = os.path.basename(image_file_list[idx])
     print("processing {} ({} of {})".format(base_name, idx, len(image_file_list)))
 
-    base_image = imageio.imread(image_file_list[idx])
-    base_mask = imageio.imread(mask_file_list[idx])
+    base_image = imageio.imread(image_file_list[idx]).astype(np.uint8)
+    base_mask = imageio.imread(mask_file_list[idx]).astype(np.uint8)
 
     # make sure all the images and masks are the same shape
     if base_image.shape[1] != IMAGE_EDGE_LENGTH:
