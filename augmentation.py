@@ -90,10 +90,9 @@ for idx in range(len(image_file_list)):
     images_aug = colour_seq.augment_images(images_aug)
     
     # write out the un-augmented image/mask pair
-    print("writing out the un-augmented image")
+    print("writing out the un-augmented image/mask pairs")
     output_base_name = "{}_orig{}".format(os.path.splitext(base_name)[0], os.path.splitext(base_name)[1])
     imageio.imwrite("{}/{}".format(augmented_images_directory,output_base_name), base_image)
-    print("writing out the un-augmented mask")
     imageio.imwrite("{}/{}".format(augmented_masks_directory,output_base_name), base_mask)
     
     # now write out the augmented image/mask pairs
