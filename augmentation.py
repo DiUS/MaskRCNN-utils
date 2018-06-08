@@ -31,6 +31,8 @@ augmented_images_directory = "{}/images".format(args.output_directory)
 augmented_masks_directory = "{}/masks".format(args.output_directory)
 os.makedirs(augmented_images_directory)
 os.makedirs(augmented_masks_directory)        
+os.chmod(augmented_images_directory, 0o777)
+os.chmod(augmented_masks_directory, 0o777)
 
 # create the augmentation sequences
 affine_seq = iaa.Sequential([
