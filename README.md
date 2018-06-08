@@ -1,6 +1,6 @@
 Utilities for working with Mask R-CNN, a neural network for object instance segmentation.
 
-The data preppipeline to train a model to segment vein instances using Mask R-CNN is as follows:
+The data preparation pipeline to train a model to segment vein instances using Mask R-CNN is as follows:
   ```
   Labelbox -> ImageSplitter -> ImageDistributer (test vs rest) -> Augmentor -> ImageDistributer (train vs val)-> MaskRCNN
   ```
