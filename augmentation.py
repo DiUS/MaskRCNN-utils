@@ -100,6 +100,9 @@ for idx in range(len(image_file_list)):
     # now write out the augmented image/mask pairs
     print("writing out the augmented image/mask pairs")
     for i in range(args.number_of_augmented_images_per_original):
-        output_base_name = "{}_augm_{}{}".format(os.path.splitext(base_name)[0], i, os.path.splitext(base_name)[1])
-        imageio.imwrite("{}/{}".format(augmented_images_directory,output_base_name), images_aug[i])
-        imageio.imwrite("{}/{}".format(augmented_masks_directory,output_base_name), masks_aug[i])
+        if len(np.nonzero(masks_aug[i])[0]) > 0:
+            output_base_name = "{}_augm_{}{}".format(os.path.splitext(base_name)[0], i, os.path.splitext(base_name)[1])
+            imageio.imwrite("{}/{}".format(augmented_images_directory,output_base_name), images_aug[i])
+            imageio.imwrite("{}/{}".format(augmented_masks_directory,output_base_name), masks_aug[i])
+        else:
+            print("discarding image/mask pair {} - no label".format(i+1))
