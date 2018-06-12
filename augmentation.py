@@ -15,6 +15,10 @@ NUMBER_OF_MASK_CHANNELS = 1
 
 MASK_PIXEL_THRESHOLD = 0.6  # at least 60% of the mask must be preserved in the augmentation
 
+#
+# source activate py35
+# nohup python -u augmentation.py -id /data/dkpun-data/augmentor/input -od /data/vein/augmented/12-jun-ratio-20-1 -na 20 > ../augmentation.log &
+#
 parser = argparse.ArgumentParser(description='Create an augmented data set.')
 parser.add_argument('-id','--input_directory', type=str, help='Base directory of the images to be augmented.', required=True)
 parser.add_argument('-od','--output_directory', type=str, help='Base directory of the output.', required=True)
@@ -24,8 +28,7 @@ args = parser.parse_args()
 image_file_list = glob.glob("{}/images/*.png".format(args.input_directory))
 mask_file_list = glob.glob("{}/masks/*.png".format(args.input_directory))
 
-number_of_images_to_be_generated = len(image_file_list) * (args.number_of_augmented_images_per_original+1)
-number_of_images_output = 0
+total_images_output = 0
 
 # remove all previous augmentations in this base directory
 if os.path.exists(args.output_directory):
@@ -95,9 +98,11 @@ for idx in range(len(image_file_list)):
     output_base_name = "{}_orig{}".format(os.path.splitext(base_name)[0], os.path.splitext(base_name)[1])
     imageio.imwrite("{}/{}".format(augmented_images_directory,output_base_name), base_image)
     imageio.imwrite("{}/{}".format(augmented_masks_directory,output_base_name), base_mask)
-    number_of_images_output += 1
+    total_images_output += 1
 
-    while number_of_images_output < number_of_images_to_be_generated:
+    number_of_augmentations_for_this_image = 0
+
+    while number_of_augmentations_for_this_image < args.number_of_augmented_images_per_original:
         # Convert the stochastic sequence of augmenters to a deterministic one.
         # The deterministic sequence will always apply the exactly same effects to the images.
         affine_det = affine_seq.to_deterministic() # call this for each batch again, NOT only once at the start
@@ -115,7 +120,10 @@ for idx in range(len(image_file_list)):
                 output_base_name = "{}_augm_{}{}".format(os.path.splitext(base_name)[0], i, os.path.splitext(base_name)[1])
                 imageio.imwrite("{}/{}".format(augmented_images_directory,output_base_name), images_aug[i])
                 imageio.imwrite("{}/{}".format(augmented_masks_directory,output_base_name), masks_aug[i])
-                number_of_images_output += 1
+                number_of_augmentations_for_this_image += 1
             else:
                 print("discarding image/mask pair {} - insufficient label".format(i+1))
-        print("images output {} ({} images required)".format(number_of_images_output, number_of_images_to_be_generated))
+        print("augmentations completed {}".format(number_of_augmentations_for_this_image))
+    total_images_output += number_of_augmentations_for_this_image
+
+print("augmented set of {} images generated from {} input images".format(total_images_output, len(image_file_list)))
