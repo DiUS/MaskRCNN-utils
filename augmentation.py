@@ -13,6 +13,8 @@ IMAGE_EDGE_LENGTH = 1300
 NUMBER_OF_IMAGE_CHANNELS = 3
 NUMBER_OF_MASK_CHANNELS = 1
 
+MASK_PIXEL_THRESHOLD = 0.6  # at least 60% of the mask must be preserved in the augmentation
+
 parser = argparse.ArgumentParser(description='Create an augmented data set.')
 parser.add_argument('-id','--input_directory', type=str, help='Base directory of the images to be augmented.', required=True)
 parser.add_argument('-od','--output_directory', type=str, help='Base directory of the output.', required=True)
@@ -21,6 +23,9 @@ args = parser.parse_args()
 
 image_file_list = glob.glob("{}/images/*.png".format(args.input_directory))
 mask_file_list = glob.glob("{}/masks/*.png".format(args.input_directory))
+
+number_of_images_to_be_generated = len(image_file_list) * (args.number_of_augmented_images_per_original+1)
+number_of_images_output = 0
 
 # remove all previous augmentations in this base directory
 if os.path.exists(args.output_directory):
@@ -72,7 +77,9 @@ for idx in range(len(image_file_list)):
         base_mask = new_base_mask
     else:
         base_mask.shape = (IMAGE_EDGE_LENGTH, IMAGE_EDGE_LENGTH, 1)
-    
+
+    base_mask_pixel_count = np.count_nonzero(base_mask)
+
     images_list = []
     masks_list = []
     for i in range(args.number_of_augmented_images_per_original):
@@ -83,28 +90,32 @@ for idx in range(len(image_file_list)):
     images = np.stack(images_list, axis=0)
     masks = np.stack(masks_list, axis=0)
 
-    # Convert the stochastic sequence of augmenters to a deterministic one.
-    # The deterministic sequence will always apply the exactly same effects to the images.
-    affine_det = affine_seq.to_deterministic() # call this for each batch again, NOT only once at the start
-
-    images_aug = affine_det.augment_images(images)
-    masks_aug = affine_det.augment_images(masks)
-    
-    # apply the colour augmentations to the images but not the masks
-    images_aug = colour_seq.augment_images(images_aug)
-    
     # write out the un-augmented image/mask pair
     print("writing out the un-augmented image/mask pair")
     output_base_name = "{}_orig{}".format(os.path.splitext(base_name)[0], os.path.splitext(base_name)[1])
     imageio.imwrite("{}/{}".format(augmented_images_directory,output_base_name), base_image)
     imageio.imwrite("{}/{}".format(augmented_masks_directory,output_base_name), base_mask)
-    
-    # now write out the augmented image/mask pairs
-    print("writing out the augmented image/mask pairs")
-    for i in range(args.number_of_augmented_images_per_original):
-        if np.count_nonzero(masks_aug[i]) > 0:
-            output_base_name = "{}_augm_{}{}".format(os.path.splitext(base_name)[0], i, os.path.splitext(base_name)[1])
-            imageio.imwrite("{}/{}".format(augmented_images_directory,output_base_name), images_aug[i])
-            imageio.imwrite("{}/{}".format(augmented_masks_directory,output_base_name), masks_aug[i])
-        else:
-            print("discarding image/mask pair {} - no label".format(i+1))
+    number_of_images_output += 1
+
+    while number_of_images_output < number_of_images_to_be_generated:
+        # Convert the stochastic sequence of augmenters to a deterministic one.
+        # The deterministic sequence will always apply the exactly same effects to the images.
+        affine_det = affine_seq.to_deterministic() # call this for each batch again, NOT only once at the start
+
+        images_aug = affine_det.augment_images(images)
+        masks_aug = affine_det.augment_images(masks)
+        
+        # apply the colour augmentations to the images but not the masks
+        images_aug = colour_seq.augment_images(images_aug)
+        
+        # now write out the augmented image/mask pairs
+        print("writing out the augmented image/mask pairs")
+        for i in range(args.number_of_augmented_images_per_original):
+            if np.count_nonzero(masks_aug[i]) > (base_mask_pixel_count * MASK_PIXEL_THRESHOLD):
+                output_base_name = "{}_augm_{}{}".format(os.path.splitext(base_name)[0], i, os.path.splitext(base_name)[1])
+                imageio.imwrite("{}/{}".format(augmented_images_directory,output_base_name), images_aug[i])
+                imageio.imwrite("{}/{}".format(augmented_masks_directory,output_base_name), masks_aug[i])
+                number_of_images_output += 1
+            else:
+                print("discarding image/mask pair {} - insufficient label".format(i+1))
+        print("images output {} ({} images required)".format(number_of_images_output, number_of_images_to_be_generated))
