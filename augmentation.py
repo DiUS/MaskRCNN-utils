@@ -13,7 +13,7 @@ IMAGE_EDGE_LENGTH = 1300
 NUMBER_OF_IMAGE_CHANNELS = 3
 NUMBER_OF_MASK_CHANNELS = 1
 
-MASK_PIXEL_THRESHOLD = 0.6  # at least 60% of the mask must be preserved in the augmentation
+MASK_PIXEL_THRESHOLD = 0.8  # at least this proportion of the mask must be preserved in the augmentation
 
 #
 # source activate py35
