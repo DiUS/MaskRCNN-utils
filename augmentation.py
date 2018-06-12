@@ -22,7 +22,7 @@ MASK_PIXEL_THRESHOLD = 0.8  # at least this proportion of the mask must be prese
 parser = argparse.ArgumentParser(description='Create an augmented data set.')
 parser.add_argument('-id','--input_directory', type=str, help='Base directory of the images to be augmented.', required=True)
 parser.add_argument('-od','--output_directory', type=str, help='Base directory of the output.', required=True)
-parser.add_argument('-na','--number_of_augmented_images_per_original', type=int, default=1, help='Number of augmented image/mask pairs to produce for each input image/mask pair.', required=False)
+parser.add_argument('-na','--number_of_augmented_images_per_original', type=int, default=1, help='Minimum number of augmented image/mask pairs to produce for each input image/mask pair.', required=False)
 args = parser.parse_args()
 
 image_file_list = glob.glob("{}/images/*.png".format(args.input_directory))
@@ -49,6 +49,11 @@ affine_seq = iaa.Sequential([
     iaa.Fliplr(0.5), # horizontally flip 50% of the images
     iaa.Flipud(0.5),
     iaa.Affine(rotate=(-120, 120)) # rotate images between -120 and +120 degrees
+], random_order=True)
+
+no_rotation_affine_seq = iaa.Sequential([
+    iaa.Fliplr(0.5), # horizontally flip 50% of the images
+    iaa.Flipud(0.5)
 ], random_order=True)
 
 colour_seq = iaa.Sequential([
@@ -101,14 +106,19 @@ for idx in range(len(image_file_list)):
     total_images_output += 1
 
     number_of_augmentations_for_this_image = 0
+    number_of_retries = 0
 
     while number_of_augmentations_for_this_image < args.number_of_augmented_images_per_original:
         # Convert the stochastic sequence of augmenters to a deterministic one.
         # The deterministic sequence will always apply the exactly same effects to the images.
-        affine_det = affine_seq.to_deterministic() # call this for each batch again, NOT only once at the start
-
-        images_aug = affine_det.augment_images(images)
-        masks_aug = affine_det.augment_images(masks)
+        if number_of_retries == 0:
+            affine_det = affine_seq.to_deterministic() # call this for each batch again, NOT only once at the start
+            images_aug = affine_det.augment_images(images)
+            masks_aug = affine_det.augment_images(masks)
+        else:
+            affine_det = no_rotation_affine_seq.to_deterministic() # call this for each batch again, NOT only once at the start
+            images_aug = affine_det.augment_images(images)
+            masks_aug = affine_det.augment_images(masks)
         
         # apply the colour augmentations to the images but not the masks
         images_aug = colour_seq.augment_images(images_aug)
@@ -124,6 +134,7 @@ for idx in range(len(image_file_list)):
             else:
                 print("discarding image/mask pair {} - insufficient label".format(i+1))
         print("augmentations completed {}".format(number_of_augmentations_for_this_image))
+        number_of_retries += 1
     total_images_output += number_of_augmentations_for_this_image
 
 print("augmented set of {} images generated from {} input images".format(total_images_output, len(image_file_list)))
