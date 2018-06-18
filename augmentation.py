@@ -123,17 +123,19 @@ for idx in range(len(image_file_list)):
         # apply the colour augmentations to the images but not the masks
         images_aug = colour_seq.augment_images(images_aug)
         
-        # now write out the augmented image/mask pairs
-        print("writing out the augmented image/mask pairs")
-        for i in range(args.number_of_augmented_images_per_original - number_of_augmentations_for_this_image):
+        # now write out the augmented image/mask pair
+        print("writing out the augmented image/mask pair")
+        for i in range(len(images_aug)):
             if np.count_nonzero(masks_aug[i]) > (base_mask_pixel_count * MASK_PIXEL_THRESHOLD):
-                output_base_name = "{}_augm_{}{}".format(os.path.splitext(base_name)[0], i, os.path.splitext(base_name)[1])
+                output_base_name = "{}_augm_{}{}".format(os.path.splitext(base_name)[0], number_of_augmentations_for_this_image, os.path.splitext(base_name)[1])
                 imageio.imwrite("{}/{}".format(augmented_images_directory,output_base_name), images_aug[i])
                 imageio.imwrite("{}/{}".format(augmented_masks_directory,output_base_name), masks_aug[i])
                 number_of_augmentations_for_this_image += 1
             else:
                 print("discarding image/mask pair {} - insufficient label".format(i+1))
         print("augmentations completed {}".format(number_of_augmentations_for_this_image))
+        if number_of_augmentations_for_this_image == args.number_of_augmented_images_per_original:
+            break
         number_of_retries += 1
     total_images_output += number_of_augmentations_for_this_image
 
