@@ -131,11 +131,11 @@ for idx in range(len(image_file_list)):
                 imageio.imwrite("{}/{}".format(augmented_images_directory,output_base_name), images_aug[i])
                 imageio.imwrite("{}/{}".format(augmented_masks_directory,output_base_name), masks_aug[i])
                 number_of_augmentations_for_this_image += 1
+                if number_of_augmentations_for_this_image == args.number_of_augmented_images_per_original:
+                    break
             else:
                 print("discarding image/mask pair {} - insufficient label".format(i+1))
-        print("augmentations completed {}".format(number_of_augmentations_for_this_image))
-        if number_of_augmentations_for_this_image == args.number_of_augmented_images_per_original:
-            break
+        print("completed {} augmentations for this image.".format(number_of_augmentations_for_this_image))
         number_of_retries += 1
     total_images_output += number_of_augmentations_for_this_image
 
