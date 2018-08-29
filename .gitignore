@@ -2,5 +2,4 @@
 *.sw?
 tmp/
 .ipynb_checkpoints
-output
-input
+dataset
