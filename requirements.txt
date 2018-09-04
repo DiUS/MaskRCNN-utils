@@ -1,5 +1,9 @@
-json
 imageio
 numpy
-skimage
+scikit-image
+matplotlib
+pandas
+imgaug
+opencv-python
+Augmentor
 
