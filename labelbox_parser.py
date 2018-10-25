@@ -14,6 +14,7 @@ import argparse
 parser = argparse.ArgumentParser(description='Parse Labelbox json export to generate images and their masks.')
 parser.add_argument('-ljf','--labelbox_json_file', type=str, help='Path to Labelbox JSON file.', required=True)
 parser.add_argument('-lcn','--labelbox_class_names', action='append', help='Labelbox class names', required=True)
+parser.add_argument('-lid','--local_image_dir', type=str, help='Base directory of local images.', required=False)
 parser.add_argument('-od','--output_dir', type=str, help='Base directory of the output.', required=True)
 parser.add_argument('--resize_images', dest='resize_images', action='store_true', help='Resize images.')
 parser.set_defaults(resize_images=False)
@@ -63,19 +64,25 @@ for item in labelbox_json:
 
     image_name = item['External ID']
     image_url = item['Labeled Data']
-    print("image_url: {}".format(image_url))
+    if args.local_image_dir:
+        image_ref = os.path.join(args.local_image_dir, image_name)
+    else:
+        image_ref = image_url
+    print("Image ref: {}".format(image_ref))
 
-    image = io.imread(image_url)
+    image = io.imread(image_ref)
     height, width = image.shape[:2]
 
     if args.resize_images:
         image, padding = resize_image_to_height(image)
 
-    for label_name, label_polygons in labels.items():
+    for label_name, label_regions in labels.items():
         if label_name not in args.labelbox_class_names:
             continue
 
-        for index, label_polygon in enumerate(label_polygons):
+        for index, label_region in enumerate(label_regions):
+            assert 'geometry' in label_region
+            label_polygon = label_region['geometry']
             mask = np.zeros((height, width), dtype=np.uint8)
             all_points_x = []
             all_points_y = []
@@ -88,7 +95,7 @@ for item in labelbox_json:
             try:
                 mask[rr, cc] = 1
             except IndexError:
-                print('IndexError image ({}), url ({})'.format(image_name, image_url))
+                print('IndexError image ({})'.format(image_ref))
                 continue
 
             mask = np.flipud(mask)
