@@ -79,7 +79,8 @@ for item in labelbox_json:
             mask = np.zeros((height, width), dtype=np.uint8)
             all_points_x = []
             all_points_y = []
-            for coords in label_polygon:
+            geometry = label_polygon['geometry']
+            for coords in geometry:
                 all_points_x.append(coords['x'])
                 all_points_y.append(coords['y'])
 
