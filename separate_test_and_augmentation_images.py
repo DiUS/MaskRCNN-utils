@@ -23,7 +23,6 @@ parser.add_argument('-isod', '--image_splitter_output_dir', type=str, help='Dire
 parser.add_argument('-otd', '--output_test_dir', type=str, help='Base directory of the output where test dataset (images and masks) will be saved to', required=True)
 parser.add_argument('-oad', '--output_augmentation_dir', type=str, help='Base directory of the output where non-test dataset (images and masks) will be saved to for augmentation', required=True)
 parser.add_argument('-lcn','--labelbox_class_names', action='append', help='Labelbox class names', required=True)
-parser.add_argument('--presplit_images', dest='presplit_images', action='store_true', help='The images were presplit in Labelbox and did not go through the splitter stage of the pipeline.')
 args = parser.parse_args()
 
 def get_splitted_test_files(image_class):
@@ -37,16 +36,13 @@ def get_splitted_test_files(image_class):
     ))
 
     splitted_test_files = []
-    if args.presplit_images: # the images were pre-split before the pipeline
-        splitted_test_files = labelbox_test_files
-    else: # the images were split into squares in the pipeline
-        for labelbox_test_file in labelbox_test_files:
-            splitted_test_files.extend(
-                map(
-                    (lambda x: os.path.basename(x)),
-                    glob.glob('{}/images/{}*'.format(args.image_splitter_output_dir, os.path.splitext(labelbox_test_file)[0]))
-                )
+    for labelbox_test_file in labelbox_test_files:
+        splitted_test_files.extend(
+            map(
+                (lambda x: os.path.basename(x)),
+                glob.glob('{}/images/{}*'.format(args.image_splitter_output_dir, os.path.splitext(labelbox_test_file)[0]))
             )
+        )
     return splitted_test_files
 
 def normalise_class_name(class_name):
