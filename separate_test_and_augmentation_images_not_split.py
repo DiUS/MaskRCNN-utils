@@ -27,7 +27,9 @@ all_files = os.listdir(os.path.join(args.labelbox_output_dir, 'images'))
 
 test_files = []
 for class_name in args.labelbox_class_names:
-    test_files.append(get_test_files(class_name))
+    test_files += get_test_files(class_name)
+
+print(test_files)
 
 # remove any test dataset from previous run
 if os.path.exists(args.output_test_dir):
