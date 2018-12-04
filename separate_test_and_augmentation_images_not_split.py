@@ -48,5 +48,5 @@ for test_file in test_files:
 
 # copy each augmentation image and its mask to the augmentation directory
 for augmentation_file in (set(all_files) - set(test_files)):
-    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, test_file), "{}/images/{}".format(args.output_augmentation_dir, test_file))
-    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, test_file), "{}/masks/{}".format(args.output_augmentation_dir, test_file))
+    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, augmentation_file), "{}/images/{}".format(args.output_augmentation_dir, augmentation_file))
+    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, augmentation_file), "{}/masks/{}".format(args.output_augmentation_dir, augmentation_file))
