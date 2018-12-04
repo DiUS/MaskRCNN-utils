@@ -18,18 +18,16 @@ args = parser.parse_args()
 
 def get_test_files(class_name):
     class_file_list = glob.glob("{}/images/*_class_{}.png".format(args.labelbox_output_dir, class_name))
-    number_to_select = int(TEST_DATASET_PERCENT/100.0 * len(class_file_list))
+    number_to_select = int(round(TEST_DATASET_PERCENT/100.0 * len(class_file_list)))
     print("selecting {} images from the class {} for the test set".format(number_to_select, class_name))
     test_files = [os.path.basename(item) for item in random.sample(class_file_list, number_to_select)]
     return test_files
 
-all_files = os.listdir(os.path.join(args.labelbox_output_dir, 'images'))
+all_files = [os.path.basename(item) for item in glob.glob("{}/images/*.png".format(args.labelbox_output_dir))]
 
 test_files = []
 for class_name in args.labelbox_class_names:
     test_files += get_test_files(class_name)
-
-print(test_files)
 
 # remove any test dataset from previous run
 if os.path.exists(args.output_test_dir):
@@ -47,3 +45,8 @@ os.makedirs("{}/masks".format(args.output_augmentation_dir))
 for test_file in test_files:
     shutil.copy("{}/images/{}".format(args.labelbox_output_dir, test_file), "{}/images/{}".format(args.output_test_dir, test_file))
     shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, test_file), "{}/masks/{}".format(args.output_test_dir, test_file))
+
+# copy each augmentation image and its mask to the augmentation directory
+for augmentation_file in (set(all_files) - set(test_files)):
+    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, test_file), "{}/images/{}".format(args.output_augmentation_dir, test_file))
+    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, test_file), "{}/masks/{}".format(args.output_augmentation_dir, test_file))
