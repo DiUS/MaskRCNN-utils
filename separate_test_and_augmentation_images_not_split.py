@@ -20,7 +20,7 @@ def get_test_files(class_name):
     class_file_list = glob.glob("{}/images/*_class_{}.png".format(args.labelbox_output_dir, class_name))
     number_to_select = int(TEST_DATASET_PERCENT/100.0 * len(class_file_list))
     print("selecting {} images from the class {} for the test set".format(number_to_select, class_name))
-    test_files = [os.path.basename for item in random.sample(class_file_list, number_to_select)]
+    test_files = [os.path.basename(item) for item in random.sample(class_file_list, number_to_select)]
     return test_files
 
 all_files = os.listdir(os.path.join(args.labelbox_output_dir, 'images'))
