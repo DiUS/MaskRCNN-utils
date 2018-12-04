@@ -7,9 +7,9 @@ import re
 import argparse
 import random
 
-VALIDATION_DATASET_PERCENT = 5
+VALIDATION_DATASET_PERCENT = 5 # taken from the non-test set
 
-parser = argparse.ArgumentParser(description='Separate 5% of total images and masks to be used as validation dataset on the trained Mask R-CNN model')
+parser = argparse.ArgumentParser(description='Take 5 per cent of the non-test set to be used as validation dataset on the trained Mask R-CNN model')
 parser.add_argument('-id', '--input_dir', type=str, help='Directory containing the images and masks', required=True)
 parser.add_argument('-otd', '--output_training_dir', type=str, help='Base directory where the training dataset (images and masks) will be saved.', required=True)
 parser.add_argument('-ovd', '--output_validation_dir', type=str, help='Base directory where the validation dataset (images and masks) will be saved.', required=True)
@@ -19,7 +19,7 @@ args = parser.parse_args()
 def get_files_for_class(class_name):
     class_file_list = glob.glob("{}/images/*_class_{}.png".format(args.input_dir, class_name))
     number_to_select = int(round(VALIDATION_DATASET_PERCENT/100.0 * len(class_file_list)))
-    print("selecting {} images from the class {} for the test set".format(number_to_select, class_name))
+    print("selecting {} images from the class {} for the validation set".format(number_to_select, class_name))
     file_list = [os.path.basename(item) for item in random.sample(class_file_list, number_to_select)]
     return file_list
 
