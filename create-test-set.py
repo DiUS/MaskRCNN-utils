@@ -64,5 +64,5 @@ for f in (set(all_files) - set(test_files)):
     mask_dir = "{}/{}/masks".format(args.output_augmentation_dir, image_id)
     os.makedirs(os.path.dirname(image_dir), exist_ok=True)
     os.makedirs(os.path.dirname(mask_dir), exist_ok=True)
-    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, f), "{}/{}".format(image_dir, f))
-    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, f), "{}/{}".format(mask_dir, f))
+    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, f), image_dir)
+    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, f), mask_dir)
