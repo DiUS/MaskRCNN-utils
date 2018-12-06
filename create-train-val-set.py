@@ -16,18 +16,18 @@ parser.add_argument('-ovd', '--output_validation_dir', type=str, help='Base dire
 parser.add_argument('-lcn','--labelbox_class_names', action='append', help='Labelbox class names', required=True)
 args = parser.parse_args()
 
-def get_files_for_class(class_name):
-    class_file_list = glob.glob("{}/images/*_class_{}.png".format(args.input_dir, class_name))
-    number_to_select = int(round(VALIDATION_DATASET_PERCENT/100.0 * len(class_file_list)))
+def get_image_ids_for_class(class_name):
+    class_image_id_list = glob.glob("{}/*_class_{}".format(args.input_dir, class_name))
+    number_to_select = int(round(VALIDATION_DATASET_PERCENT/100.0 * len(class_image_id_list)))
     print("selecting {} images from the class {} for the validation set".format(number_to_select, class_name))
-    file_list = [os.path.basename(item) for item in random.sample(class_file_list, number_to_select)]
-    return file_list
+    image_id_list = list(random.sample(class_image_id_list, number_to_select))
+    return image_id_list
 
-all_files = [os.path.basename(item) for item in glob.glob("{}/images/*.png".format(args.input_dir))]
+all_image_ids = glob.glob("{}/*".format(args.input_dir))
 
-validation_files = []
+validation_image_ids = []
 for class_name in args.labelbox_class_names:
-    validation_files += get_files_for_class(class_name)
+    validation_image_ids += get_image_ids_for_class(class_name)
 
 # remove datasets from a previous run
 if os.path.exists(args.output_training_dir):
@@ -35,18 +35,10 @@ if os.path.exists(args.output_training_dir):
 if os.path.exists(args.output_validation_dir):
     shutil.rmtree(args.output_validation_dir)
 
-# and create clean directories
-os.makedirs("{}/images".format(args.output_training_dir))
-os.makedirs("{}/masks".format(args.output_training_dir))
-os.makedirs("{}/images".format(args.output_validation_dir))
-os.makedirs("{}/masks".format(args.output_validation_dir))
-
 # copy each validation set image and its mask to the validation set directory
-for f in validation_files:
-    shutil.copy("{}/images/{}".format(args.input_dir, f), "{}/images/{}".format(args.output_validation_dir, f))
-    shutil.copy("{}/masks/{}".format(args.input_dir, f), "{}/masks/{}".format(args.output_validation_dir, f))
+for image_id in validation_image_ids:
+    shutil.copytree("{}/{}".format(args.input_dir, image_id), "{}/{}".format(args.output_validation_dir, image_id))
 
 # copy each training set image and its mask to the training set directory
-for f in (set(all_files) - set(validation_files)):
-    shutil.copy("{}/images/{}".format(args.input_dir, f), "{}/images/{}".format(args.output_training_dir, f))
-    shutil.copy("{}/masks/{}".format(args.input_dir, f), "{}/masks/{}".format(args.output_training_dir, f))
+for image_id in (set(all_image_ids) - set(validation_image_ids)):
+    shutil.copytree("{}/{}".format(args.input_dir, image_id), "{}/{}".format(args.output_training_dir, image_id))
