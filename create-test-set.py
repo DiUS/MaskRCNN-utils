@@ -52,8 +52,8 @@ for f in test_files:
     image_id = os.path.splitext(f)[0]
     image_dir = "{}/{}/images".format(args.output_test_dir, image_id)
     mask_dir = "{}/{}/masks".format(args.output_test_dir, image_id)
-    os.makedirs(os.path.dirname(image_dir))
-    os.makedirs(os.path.dirname(mask_dir))
+    os.makedirs(image_dir)
+    os.makedirs(mask_dir)
     # image_src = "{}/images/{}".format(args.labelbox_output_dir, f)
     # shutil.copy(image_src, image_dir)
     # print("copying from {} to {}".format(image_src, image_dir))
@@ -65,7 +65,7 @@ for f in (set(all_files) - set(test_files)):
     image_id = os.path.splitext(f)[0]
     image_dir = "{}/{}/images".format(args.output_augmentation_dir, image_id)
     mask_dir = "{}/{}/masks".format(args.output_augmentation_dir, image_id)
-    os.makedirs(os.path.dirname(image_dir))
-    os.makedirs(os.path.dirname(mask_dir))
+    os.makedirs(image_dir)
+    os.makedirs(mask_dir)
     # shutil.copy("{}/images/{}".format(args.labelbox_output_dir, f), image_dir)
     # shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, f), mask_dir)
