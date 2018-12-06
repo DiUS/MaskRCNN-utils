@@ -49,10 +49,20 @@ os.makedirs(args.output_augmentation_dir)
 
 # copy each test image and its mask to the test directory
 for f in test_files:
-    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, f), "{}/{}/images/{}".format(args.output_test_dir, os.path.splitext(f)[0], f))
-    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, f), "{}/{}/masks/{}".format(args.output_test_dir, os.path.splitext(f)[0], f))
+    image_id = os.path.splitext(f)[0]
+    image_dir = "{}/{}/images".format(args.output_test_dir, image_id)
+    mask_dir = "{}/{}/masks".format(args.output_test_dir, image_id)
+    os.makedirs(os.path.dirname(image_dir), exist_ok=True)
+    os.makedirs(os.path.dirname(mask_dir), exist_ok=True)
+    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, f), "{}/{}".format(image_dir, f))
+    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, f), "{}/{}".format(mask_dir, f))
 
 # copy each augmentation image and its mask to the augmentation directory
 for f in (set(all_files) - set(test_files)):
-    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, f), "{}/{}/images/{}".format(args.output_augmentation_dir, os.path.splitext(f)[0], f))
-    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, f), "{}/{}/masks/{}".format(args.output_augmentation_dir, os.path.splitext(f)[0], f))
+    image_id = os.path.splitext(f)[0]
+    image_dir = "{}/{}/images".format(args.output_augmentation_dir, image_id)
+    mask_dir = "{}/{}/masks".format(args.output_augmentation_dir, image_id)
+    os.makedirs(os.path.dirname(image_dir), exist_ok=True)
+    os.makedirs(os.path.dirname(mask_dir), exist_ok=True)
+    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, f), "{}/{}".format(image_dir, f))
+    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, f), "{}/{}".format(mask_dir, f))
