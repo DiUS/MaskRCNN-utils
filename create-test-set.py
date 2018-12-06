@@ -50,9 +50,9 @@ os.makedirs(args.output_augmentation_dir)
 # copy each test image and its mask to the test directory
 for f in test_files:
     image_id = os.path.splitext(f)[0]
+    os.makedirs("{}/{}".format(args.output_test_dir, image_id), exist_ok=True)
     image_dir = "{}/{}/images".format(args.output_test_dir, image_id)
     mask_dir = "{}/{}/masks".format(args.output_test_dir, image_id)
-    print("making {} and {}".format(image_dir, mask_dir))
     os.makedirs(os.path.dirname(image_dir), exist_ok=True)
     os.makedirs(os.path.dirname(mask_dir), exist_ok=True)
     shutil.copy("{}/images/{}".format(args.labelbox_output_dir, f), "{}/{}".format(image_dir, f))
