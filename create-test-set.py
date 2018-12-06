@@ -54,11 +54,8 @@ for f in test_files:
     mask_dir = "{}/{}/masks".format(args.output_test_dir, image_id)
     os.makedirs(image_dir)
     os.makedirs(mask_dir)
-    # image_src = "{}/images/{}".format(args.labelbox_output_dir, f)
-    # shutil.copy(image_src, image_dir)
-    # print("copying from {} to {}".format(image_src, image_dir))
-    # mask_src = "{}/masks/{}".format(args.labelbox_output_dir, f)
-    # shutil.copy(mask_src, mask_dir)
+    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, f), image_dir)
+    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, f), mask_dir)
 
 # copy each augmentation image and its mask to the augmentation directory
 for f in (set(all_files) - set(test_files)):
@@ -67,5 +64,5 @@ for f in (set(all_files) - set(test_files)):
     mask_dir = "{}/{}/masks".format(args.output_augmentation_dir, image_id)
     os.makedirs(image_dir)
     os.makedirs(mask_dir)
-    # shutil.copy("{}/images/{}".format(args.labelbox_output_dir, f), image_dir)
-    # shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, f), mask_dir)
+    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, f), image_dir)
+    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, f), mask_dir)
