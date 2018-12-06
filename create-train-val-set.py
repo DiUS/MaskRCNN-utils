@@ -23,7 +23,7 @@ def get_image_ids_for_class(class_name):
     image_id_list = list(random.sample(class_image_id_list, number_to_select))
     return image_id_list
 
-all_image_ids = glob.glob("{}/*".format(args.input_dir))
+all_image_ids = glob.glob("{}/*_class_*".format(args.input_dir))
 
 validation_image_ids = []
 for class_name in args.labelbox_class_names:
