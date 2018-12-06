@@ -36,17 +36,23 @@ if os.path.exists(args.output_augmentation_dir):
     shutil.rmtree(args.output_augmentation_dir)
 
 # and create clean directories
-os.makedirs("{}/images".format(args.output_test_dir))
-os.makedirs("{}/masks".format(args.output_test_dir))
-os.makedirs("{}/images".format(args.output_augmentation_dir))
-os.makedirs("{}/masks".format(args.output_augmentation_dir))
+os.makedirs(args.output_test_dir)
+os.makedirs(args.output_augmentation_dir)
+
+# The Mask-RCNN nucleus sample on which this is based had a directory structure where:
+# - each image in the training set had an image ID (the image filename)
+# - the image ID formed the directory name under stage1_train
+# - in each directory there was a 'images' and 'masks' subdirectory
+# - the 'images' directory contained the image file
+# - the 'masks' dirctory contained a mask file for each object instance
+# As we have already created a separate file for each instance in the parsing step, there is always a single file in each directory
 
 # copy each test image and its mask to the test directory
-for test_file in test_files:
-    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, test_file), "{}/images/{}".format(args.output_test_dir, test_file))
-    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, test_file), "{}/masks/{}".format(args.output_test_dir, test_file))
+for f in test_files:
+    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, f), "{}/{}/images/{}".format(args.output_test_dir, os.path.splitext(f)[0], f))
+    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, f), "{}/{}/masks/{}".format(args.output_test_dir, os.path.splitext(f)[0], f))
 
 # copy each augmentation image and its mask to the augmentation directory
-for augmentation_file in (set(all_files) - set(test_files)):
-    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, augmentation_file), "{}/images/{}".format(args.output_augmentation_dir, augmentation_file))
-    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, augmentation_file), "{}/masks/{}".format(args.output_augmentation_dir, augmentation_file))
+for f in (set(all_files) - set(test_files)):
+    shutil.copy("{}/images/{}".format(args.labelbox_output_dir, f), "{}/{}/images/{}".format(args.output_augmentation_dir, os.path.splitext(f)[0], f))
+    shutil.copy("{}/masks/{}".format(args.labelbox_output_dir, f), "{}/{}/masks/{}".format(args.output_augmentation_dir, os.path.splitext(f)[0], f))
